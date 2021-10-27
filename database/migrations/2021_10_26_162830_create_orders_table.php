@@ -20,6 +20,7 @@ class CreateOrdersTable extends Migration
             $table->bigInteger('price');
             $table->bigInteger('quantity');
             $table->tinyInteger('status')->default(Order::STATUS_PENDING);
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
