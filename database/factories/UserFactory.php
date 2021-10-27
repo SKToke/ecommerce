@@ -24,6 +24,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * @return Factory
+     */
+    public function admin(): Factory
+    {
+        return $this->state([
+            'is_admin' => 1,
+        ]);
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
