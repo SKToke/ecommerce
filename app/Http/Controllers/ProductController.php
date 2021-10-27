@@ -12,10 +12,10 @@ class ProductController extends Controller
 {
     public function index(): JsonResource
     {
-        $query = request('query') ?: null;
+        list($query, $sort, $type, $item) = [request('query'), request('sort') ?: 'name', request('type') ?: 'asc', request('item') ?: 20];
         $products = Product::when($query, function ($builder) use ($query) {
             $builder->where('name', 'LIKE', '%' . $query . '%');
-        })->orderBy('name')->paginate(20);
+        })->orderBy($sort, $type)->paginate($item);;
         return ProductResource::collection($products);
     }
 

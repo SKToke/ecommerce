@@ -5,8 +5,6 @@ namespace Tests\Feature;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
@@ -18,11 +16,13 @@ class ProductControllerTest extends TestCase
      */
     public function itListsAllProductOrderByName()
     {
-        Product::factory(20)->create();
-        $response = $this->get('/api/products');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        Product::factory(50)->create();
+        $response = $this->get('/api/products?item=25');
         $response->assertOk()
             ->assertJsonStructure(['data', 'meta', 'links'])
-            ->assertJsonCount(20, 'data')
+            ->assertJsonCount(25, 'data')
             ->assertJsonStructure(['data' => ['*' => ['id', 'name', 'description', 'price', 'quantity', 'image']]]);
     }
 
@@ -31,13 +31,44 @@ class ProductControllerTest extends TestCase
      */
     public function itSearchAProductByName()
     {
+        $user = User::factory()->create();
+        $this->actingAs($user);
         Product::factory(20)->create();
         $product = Product::factory()->create(['name' => 'Search Product']);
         $response = $this->get('/api/products?query=' . $product->name);
         $response->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.id', $product->id)
             ->assertJsonPath('data.0.name', $product->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itShortAProductByPriceASC()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        Product::factory(20)->create();
+        $product = Product::factory()->create(['price' => 0]);
+        $response = $this->get('/api/products?sort=price&type=asc');
+        $response->assertOk()
+            ->assertJsonCount(20, 'data')
+            ->assertJsonPath('data.0.price', $product->price);
+    }
+
+    /**
+     * @test
+     */
+    public function itShortAProductByPriceDESC()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        Product::factory(20)->create();
+        $product = Product::factory()->create(['price' => 99999999]);
+        $response = $this->get('/api/products?sort=price&type=desc');
+        $response->assertOk()
+            ->assertJsonCount(20, 'data')
+            ->assertJsonPath('data.0.price', $product->price);
     }
 
     /**
@@ -57,9 +88,7 @@ class ProductControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonCount(6, 'data')
             ->assertJsonPath('data.name', 'new product');
-        $this->assertDatabaseHas('products', [
-            'id' => $response->json('data.id')
-        ]);
+        $this->assertDatabaseHas('products', ['id' => $response->json('data.id')]);
     }
 
     /**
