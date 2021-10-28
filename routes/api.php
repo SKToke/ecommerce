@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::delete('/products/{product}', [ProductController::class, 'delete']);
 
     /* Order */
+    Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'create']);
     Route::put('/orders/{order}', [OrderController::class, 'update']);
 });

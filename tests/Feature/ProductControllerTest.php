@@ -44,7 +44,7 @@ class ProductControllerTest extends TestCase
     /**
      * @test
      */
-    public function itShortAProductByPriceASC()
+    public function itShortAProductByPriceAscendingOrder()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -59,7 +59,7 @@ class ProductControllerTest extends TestCase
     /**
      * @test
      */
-    public function itShortAProductByPriceDESC()
+    public function itShortAProductByPriceDescendingOrder()
     {
         $user = User::factory()->create();
         $this->actingAs($user);

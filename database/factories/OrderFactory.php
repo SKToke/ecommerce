@@ -6,7 +6,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Str;
 
 class OrderFactory extends Factory
 {
@@ -26,8 +25,7 @@ class OrderFactory extends Factory
     {
         $product = Product::factory()->create();
         return [
-//            'id' => Order::getUniqueId(),
-            'id' => substr(md5(Str::random(15) . uniqid('O')), 20),
+            'order_id' => uniqid('O'),
             'product_id' => $product,
             'price' => $product->price,
             'quantity' => $this->faker->numberBetween(1, 50),
