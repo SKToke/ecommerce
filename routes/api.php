@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,5 +28,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'create']);
     Route::put('/orders/{order}', [OrderController::class, 'update']);
+});
+
+Route::group(['prefix' => 'user'], function () {
+    /* User */
+    Route::post('/register', [UserController::class, 'create']);
+    Route::post('/login', [UserController::class, 'login']);
 });
 
