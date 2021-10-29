@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\OrderHistory;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Validators\OrderValidator;
@@ -43,13 +44,19 @@ class OrderController extends Controller
         return $product->quantity >= $order->quantity;
     }
 
+    public function show(Order $order): JsonResource
+    {
+        return OrderResource::make($order->load('histories'));
+    }
+
     public function update(Order $order): JsonResource
     {
         abort_unless(auth()->id(), Response::HTTP_FORBIDDEN);
         abort_if(!auth()->user()->is_admin && $order->status != Order::STATUS_PENDING, Response::HTTP_UNPROCESSABLE_ENTITY);
-        $attributes = (new OrderValidator())->validate($order, request()->all());
+        $attributes = (new OrderValidator())->validate($old = $order, request()->all());
         $order->fill($attributes);
         (auth()->user()->is_admin && Order::STATUS_DELIVERED == $order->status) ? $this->_updateProductQuantityAndSave($order) : $order->save();
+        OrderHistory::make($old);
         return OrderResource::make($order);
     }
 

@@ -226,4 +226,39 @@ class OrderControllerTest extends TestCase
         $response->assertUnprocessable()
             ->assertJsonPath('message', 'Out of stock');
     }
+
+
+    /**
+     * @test
+     */
+    public function itShowsHistoryOfAnOrder()
+    {
+        $user = User::factory()->create();
+        $order = Order::factory()->for($user)->create(['quantity' => 20]);
+        $this->actingAs($user);
+        $responseOne = $this->putJson('/api/orders/' . $order->id, ['quantity' => 10]);
+        $responseOne->assertOk()
+            ->assertJsonPath('data.quantity', 10)
+            ->assertJsonPath('data.id', $order->id);
+
+        $responseTwo = $this->putJson('/api/orders/' . $order->id, ['quantity' => 5]);
+        $responseTwo->assertOk()
+            ->assertJsonPath('data.quantity', 5)
+            ->assertJsonPath('data.id', $order->id);
+
+        $responseThree = $this->putJson('/api/orders/' . $order->id, ['quantity' => 2]);
+        $responseThree->assertOk()
+            ->assertJsonPath('data.quantity', 2)
+            ->assertJsonPath('data.id', $order->id);
+
+        $this->assertDatabaseHas('order_histories', ['order_id' => $order->id])
+            ->assertDatabaseCount('order_histories', 3);
+
+        $responseFour = $this->get('/api/orders/' . $order->id);
+        $responseFour->assertOk()
+            ->assertJsonCount(3, 'data.histories')
+            ->assertJsonPath('data.histories.0.quantity', $responseOne->json('data.quantity'))
+            ->assertJsonPath('data.histories.1.quantity', $responseTwo->json('data.quantity'))
+            ->assertJsonPath('data.histories.2.quantity', $responseThree->json('data.quantity'));
+    }
 }
