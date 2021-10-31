@@ -5,11 +5,24 @@ namespace Tests\Feature;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * @test
+     */
+    public function itDoesNotListsProductsIfNotLoggedIn()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, []);
+        Product::factory(50)->create();
+        $response = $this->get('/api/products?item=25');
+        $response->assertForbidden();
+    }
 
     /**
      * @test

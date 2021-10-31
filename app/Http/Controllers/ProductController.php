@@ -12,6 +12,7 @@ class ProductController extends Controller
 {
     public function index(): JsonResource
     {
+        abort_unless(auth()->user()->tokenCan('product.view'), Response::HTTP_FORBIDDEN);
         list($query, $sort, $type, $item) = [request('query'), request('sort') ?: 'name', request('type') ?: 'asc', request('item') ?: 20];
         $products = Product::when($query, function ($builder) use ($query) {
             $builder->where('name', 'LIKE', '%' . $query . '%');

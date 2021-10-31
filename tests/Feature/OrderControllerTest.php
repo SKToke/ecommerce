@@ -78,20 +78,6 @@ class OrderControllerTest extends TestCase
     /**
      * @test
      */
-    public function itCanUpdateAnOrderIfAdminWhileStatusPending()
-    {
-        $user = User::factory()->admin()->create();
-        $order = Order::factory()->for($user)->create(['quantity' => 20, 'status' => Order::STATUS_APPROVED]);
-        $this->actingAs($user);
-        $response = $this->putJson('/api/orders/' . $order->id, ['quantity' => 10]);
-        $response->assertOk()
-            ->assertJsonPath('data.quantity', 10)
-            ->assertJsonPath('data.id', $order->id);
-    }
-
-    /**
-     * @test
-     */
     public function itCanApproveAnOrderIfUserIsAdmin()
     {
         $user = User::factory()->admin()->create();

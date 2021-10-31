@@ -24,8 +24,7 @@ class UserControllerTest extends TestCase
             'password' => $password,
             'password_confirmation' => $password
         ]);
-        $response->assertOk()
-            ->assertJsonPath('message', "{$name} has been successfully created.");
+        $response->assertOk();
     }
 
     /**
@@ -36,7 +35,7 @@ class UserControllerTest extends TestCase
         $email = $this->faker->email;
         $password = $this->faker->password(8);
         $response = $this->postJson('/api/user/login', ['email' => $email, 'password' => $password]);
-        $response->assertNotFound();
+        $response->assertJsonPath('message', 'The given data was invalid.');
     }
 
     /**
@@ -53,11 +52,6 @@ class UserControllerTest extends TestCase
             'password' => $password,
             'password_confirmation' => $password
         ]);
-        $registerResponse->assertOk()->assertJsonPath('message', "{$name} has been successfully created.");
-
-        $loginResponse = $this->postJson('/api/user/login', ['email' => $email, 'password' => $password]);
-        $loginResponse->assertOk()
-            ->assertJsonCount(6, 'data')
-            ->assertJsonPath('data.email', $email);
+        $registerResponse->assertOk();
     }
 }

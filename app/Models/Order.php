@@ -20,6 +20,7 @@ class Order extends Model
     const STATUS_DELIVERED = 5;
 
     protected $casts = [
+        'status' => 'integer',
         'price' => 'integer',
         'quantity' => 'integer',
         'created_at' => 'immutable_datetime',
