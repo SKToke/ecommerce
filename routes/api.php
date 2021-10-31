@@ -30,9 +30,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::put('/orders/{order}', [OrderController::class, 'update']);
 });
 
-Route::group(['prefix' => 'user'], function () {
+Route::prefix('user')->group(function () {
     /* User */
-    Route::post('/register', [UserController::class, 'create']);
-    Route::post('/login', [UserController::class, 'login']);
+    Route::post('register', [UserController::class, 'register']);
+    Route::post('login', [UserController::class, 'login']);
+    Route::post('logout', [UserController::class, 'logout'])->middleware(['auth:sanctum', 'verified']);
 });
-

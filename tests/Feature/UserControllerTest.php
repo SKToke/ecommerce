@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    use WithFaker;
+    use WithFaker, RefreshDatabase;
 
     /**
      * @test
@@ -24,9 +24,8 @@ class UserControllerTest extends TestCase
             'password' => $password,
             'password_confirmation' => $password
         ]);
-        $response->assertCreated()
-            ->assertJsonPath('data.name', $name)
-            ->assertJsonPath('data.email', $email);
+        $response->assertOk()
+            ->assertJsonPath('message', "{$name} has been successfully created.");
     }
 
     /**
@@ -54,7 +53,7 @@ class UserControllerTest extends TestCase
             'password' => $password,
             'password_confirmation' => $password
         ]);
-        $registerResponse->assertCreated()->assertJsonPath('data.name', $name)->assertJsonPath('data.email', $email);
+        $registerResponse->assertOk()->assertJsonPath('message', "{$name} has been successfully created.");
 
         $loginResponse = $this->postJson('/api/user/login', ['email' => $email, 'password' => $password]);
         $loginResponse->assertOk()
